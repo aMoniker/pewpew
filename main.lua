@@ -29,7 +29,7 @@ function love.draw()
 end
 function love.keypressed(key, u)
     if key == ' ' then
-        pewpew.spawnProjectile('laser', zig.x + zig.ox, zig.y, 'up')
+        pewpew.spawnProjectile('laser', zig.x, zig.y, 'up')
     end
 end
 
