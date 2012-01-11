@@ -8,6 +8,8 @@ function love.load()
     screen.width = love.graphics.getWidth( )
     screen.height = love.graphics.getHeight( )
     
+    love.graphics.setColorMode('replace')
+    
     pewpew.spawnUnit('zig', screen.width / 2, screen.height / 2)
     for i=1,3 do
         pewpew.spawnUnit('raven', i * 20 + 30, i * 20 + 30)
