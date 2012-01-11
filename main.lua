@@ -2,6 +2,10 @@ require "socket"
 
 -- <3
 function love.load()
+    --love.graphics.setMode( 500, 1000, true, true, 0 )
+    love.graphics.toggleFullscreen( )
+    love.graphics.setBackgroundColor(0, 0, 10, 5)
+    
     enemies = {}
     projectiles = {}
     screen = {}
@@ -14,13 +18,64 @@ function love.load()
     for i=1,3 do
         pewpew.spawnUnit('raven', i * 20 + 30, i * 20 + 30)
     end
+    
+    
+    --messy
+    round_particle = love.graphics.newImage('images/part1.png');
+    p = love.graphics.newParticleSystem(round_particle, 1000)
+        p:setEmissionRate(300)
+        p:setSpeed(50, 50)
+        p:setSize(1.5, 0.1)
+        p:setColor(0, 50, 255, 255, 0, 0, 150, 0)
+        p:setPosition(400, 300)
+        p:setLifetime(0)
+        p:setParticleLife(0.05)
+        p:setDirection(7.851)
+        p:setSpread(0)
+        p:setTangentialAcceleration(0)
+        p:setRadialAcceleration(1)
+        p:setGravity(15)
+        p:stop()
+        
+    p1 = love.graphics.newParticleSystem(round_particle, 1000)
+        p1:setEmissionRate(300)
+        p1:setSpeed(100, 150)
+        p1:setSize(0.8, 0.1)
+        p1:setColor(255, 255, 255, 200, 200, 0, 0, 100)
+        p1:setPosition(400, 300)
+        p1:setLifetime(0)
+        p1:setParticleLife(0.05)
+        p1:setDirection(7.853)
+        p1:setSpread(0)
+        p1:setTangentialAcceleration(0)
+        p1:setRadialAcceleration(1)
+        p1:setGravity(15)
+        p1:stop()
+        
+end
+function love.update(dt)
+    p:setPosition(zig.x, zig.y + 1)
+    p:start()
+        
+    p1:setPosition(zig.x, zig.y + 1)
+    p1:start()
+    
+    p:update(dt)
+    p1:update(dt)
 end
 function love.draw()
     pewpew.debug( )
     
+    love.graphics.setColorMode('modulate')
+    love.graphics.draw(p, 0, 0)
+    love.graphics.draw(p1, 0, 0)
+    love.graphics.setColorMode('replace')
+    
     pewpew.moveZig( )
     pewpew.moveEnemies( )
     pewpew.moveProjectiles( )
+    
+    pewpew.checkCollisions( )
     
     love.graphics.draw(zig.image, zig.x, zig.y, 0, 1, 1, zig.ox, zig.oy)
     for i, enemy in ipairs(enemies) do
@@ -108,20 +163,21 @@ function pewpew.spawnProjectile(type, x, y, direction)
 end
 
 function pewpew.moveZig()
+    local speed = 3
     if love.keyboard.isDown("right") then
-        zig.x = zig.x + 2
+        zig.x = zig.x + speed
     end
     
     if love.keyboard.isDown('left') then
-        zig.x = zig.x - 2
+        zig.x = zig.x - speed
     end
     
     if love.keyboard.isDown('up') then
-        zig.y = zig.y - 2
+        zig.y = zig.y - speed
     end
     
     if love.keyboard.isDown('down') then
-        zig.y = zig.y + 2
+        zig.y = zig.y + speed
     end
 end
 function pewpew.moveEnemies()
@@ -156,8 +212,26 @@ function pewpew.moveProjectiles()
         if p.direction == 'up' then
             p.line_y = p.line_y - 4
             p.line_y1 = p.line_y1 - 4
+            if p.line_y <= 0 then table.remove(projectiles, i) end
         end
     end
+end
+
+function pewpew.checkCollisions()
+    for i, e in ipairs(enemies) do
+        for n, p in ipairs(projectiles) do
+            if pewpew.checkCollision(e.x,e.y,e.width,e.height, p.line_x-1,p.line_y1,3,10) then --hardcoded line values not good
+                --enemies.remove(e)
+                --projectiles.remove(e)
+                table.remove(enemies, i)
+                table.remove(projectiles, n)
+            end
+        end
+    end
+end
+function pewpew.checkCollision(ax1,ay1,aw,ah, bx1,by1,bw,bh)
+    local ax2,ay2,bx2,by2 = ax1 + aw, ay1 + ah, bx1 + bw, by1 + bh
+    return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
 end
 
 function pewpew.debug( obj )
