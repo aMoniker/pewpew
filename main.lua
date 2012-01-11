@@ -29,11 +29,12 @@ function love.draw()
         pewpew.spawnProjectile('laser', zig.x, zig.y, 'up')
     end
     
-    --random rectangle
+    --[[random rectangle
     love.graphics.setLine( 1, 'rough' )
     love.graphics.setColorMode('replace')
     love.graphics.setColor(0, 0, 147, 150)
     love.graphics.rectangle('line', (zig.x - zig.ox) - 5, (zig.y - zig.oy) - 5, zig.width + 10, zig.height + 10)
+    --]]
 end
 
 pewpew = {}
