@@ -1,3 +1,5 @@
+require "socket"
+
 -- <3
 function love.load()
     enemies = {}
@@ -12,6 +14,8 @@ function love.load()
     end
 end
 function love.draw()
+    pewpew.debug( )
+    
     pewpew.moveZig( )
     pewpew.moveEnemies( )
     pewpew.moveProjectiles( )
@@ -21,21 +25,38 @@ function love.draw()
         love.graphics.draw(enemy.image, enemy.x, enemy.y, 0, 1, 1, enemy.ox, enemy.oy)
     end
     
+    if love.keyboard.isDown(' ') and pewpew.timers.laser.ready( ) then
+        pewpew.spawnProjectile('laser', zig.x, zig.y, 'up')
+    end
+    
     --random rectangle
     love.graphics.setLine( 1, 'rough' )
     love.graphics.setColorMode('replace')
     love.graphics.setColor(0, 0, 147, 150)
     love.graphics.rectangle('line', (zig.x - zig.ox) - 5, (zig.y - zig.oy) - 5, zig.width + 10, zig.height + 10)
 end
-function love.keypressed(key, u)
-    if key == ' ' then
-        pewpew.spawnProjectile('laser', zig.x, zig.y, 'up')
-    end
-end
-
-
 
 pewpew = {}
+pewpew.debug_queue = {}
+pewpew.timers = {}
+pewpew.timers.laser = {
+     delay = 500
+    ,last_fired = nil
+    ,ready = function()
+                if not pewpew.timers.laser.last_fired then
+                    pewpew.timers.laser.last_fired = socket.gettime()*1000
+                    return true
+                end
+                
+                local time = socket.gettime() * 1000
+                if time - pewpew.timers.laser.last_fired >= pewpew.timers.laser.delay then
+                    pewpew.timers.laser.last_fired = socket.gettime()*1000
+                    return true
+                end
+                return false
+             end
+}
+
 function pewpew.spawnUnit(type, x, y)
     local unit = {}
     
@@ -121,7 +142,7 @@ function pewpew.moveEnemies()
         end
     end
 end
-function pewpew.moveProjectiles( )
+function pewpew.moveProjectiles()
     for i, p in ipairs(projectiles) do
         if p.type == 'laser' then
             love.graphics.setLine( 3, 'rough' )
@@ -132,6 +153,19 @@ function pewpew.moveProjectiles( )
         if p.direction == 'up' then
             p.line_y = p.line_y - 4
             p.line_y1 = p.line_y1 - 4
+        end
+    end
+end
+
+function pewpew.debug( obj )
+    if obj ~= nil then
+        pewpew.debug_queue[#pewpew.debug_queue + 1] = obj
+    else
+        local x = 10
+        local y = 10
+        for i, obj in ipairs(pewpew.debug_queue) do
+            love.graphics.print( tostring(obj), x, y, 0, 1, 1 )
+            y = y + 10
         end
     end
 end
