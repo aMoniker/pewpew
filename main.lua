@@ -235,7 +235,7 @@ end
 function pewpew.checkCollisions()
     for i, e in ipairs(enemies) do
         for n, p in ipairs(projectiles) do
-            if pewpew.checkCollision(e.x - e.ox, e.y - e.oy, e.width, e.height, p.line_x-1,p.line_y1,3,10) then --hardcoded line values not good
+            if pewpew.checkCollision(e.x - e.ox, e.y - e.oy, e.width, e.height * 0.6, p.line_x-1,p.line_y1,3,10) then --hardcoded line values not good
                 --enemies.remove(e)
                 --projectiles.remove(e)
                 table.remove(enemies, i)
