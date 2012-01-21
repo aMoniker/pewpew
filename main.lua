@@ -27,6 +27,9 @@ function love.load()
 end
 function love.update(dt)
     zig.update(dt)
+    if #enemies < 3 then
+        pewpew.spawnUnit('raven', math.random(10, screen.width - 10), math.random(20, 60))
+    end
 end
 function love.draw()
     pewpew.debug( )
@@ -43,20 +46,20 @@ function love.draw()
     pewpew.checkCollisions( )
     
     love.graphics.draw(zig.image, zig.x, zig.y, 0, 1, 1, zig.ox, zig.oy)
+    
     for i, enemy in ipairs(enemies) do
         love.graphics.draw(enemy.image, enemy.x, enemy.y, 0, 1, 1, enemy.ox, enemy.oy)
+        
+        
+        --love.graphics.setLine( 1, 'rough' )
+        --love.graphics.setColorMode('replace')
+        --love.graphics.setColor(255, 0, 0, 255)
+        --love.graphics.rectangle('line', enemy.x - enemy.ox, enemy.y - enemy.oy, enemy.width, enemy.height)
     end
     
     if love.keyboard.isDown(' ') and pewpew.timers.laser.ready( ) then
         pewpew.spawnProjectile('laser', zig.x, zig.y, 'up')
     end
-    
-    --[[random rectangle
-    love.graphics.setLine( 1, 'rough' )
-    love.graphics.setColorMode('replace')
-    love.graphics.setColor(0, 0, 147, 150)
-    love.graphics.rectangle('line', (zig.x - zig.ox) - 5, (zig.y - zig.oy) - 5, zig.width + 10, zig.height + 10)
-    --]]
 end
 
 pewpew = {}
@@ -232,7 +235,7 @@ end
 function pewpew.checkCollisions()
     for i, e in ipairs(enemies) do
         for n, p in ipairs(projectiles) do
-            if pewpew.checkCollision(e.x,e.y,e.width,e.height, p.line_x-1,p.line_y1,3,10) then --hardcoded line values not good
+            if pewpew.checkCollision(e.x - e.ox, e.y - e.oy, e.width, e.height, p.line_x-1,p.line_y1,3,10) then --hardcoded line values not good
                 --enemies.remove(e)
                 --projectiles.remove(e)
                 table.remove(enemies, i)
