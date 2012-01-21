@@ -2,9 +2,13 @@ require "socket"
 
 -- <3
 function love.load()
-    --love.graphics.setMode( 500, 1000, true, true, 0 )
-    love.graphics.toggleFullscreen( )
-    love.graphics.setBackgroundColor(0, 0, 10, 5)
+    local screen_modes = love.graphics.getModes()
+    table.sort(screen_modes, function(a, b) return a.width * a.height < b.width * b.height end)
+
+    love.graphics.setMode( screen_modes[#screen_modes].width, screen_modes[#screen_modes].height, false, true, 0 )
+    --love.graphics.setMode(1000, 1000, true, true, 0)
+    --love.graphics.toggleFullscreen( )
+    --love.graphics.setBackgroundColor(0, 0, 100, 5)
     
     enemies = {}
     projectiles = {}
@@ -15,53 +19,14 @@ function love.load()
     love.graphics.setColorMode('replace')
     
     pewpew.spawnUnit('zig', screen.width / 2, screen.height / 2)
+    zig.render()
+    
     for i=1,3 do
         pewpew.spawnUnit('raven', i * 20 + 30, i * 20 + 30)
     end
-    
-    
-    --messy
-    round_particle = love.graphics.newImage('images/part1.png');
-    p = love.graphics.newParticleSystem(round_particle, 1000)
-        p:setEmissionRate(300)
-        p:setSpeed(50, 50)
-        p:setSize(1.5, 0.1)
-        p:setColor(0, 50, 255, 255, 0, 0, 150, 0)
-        p:setPosition(400, 300)
-        p:setLifetime(0)
-        p:setParticleLife(0.05)
-        p:setDirection(7.851)
-        p:setSpread(0)
-        p:setTangentialAcceleration(0)
-        p:setRadialAcceleration(1)
-        p:setGravity(15)
-        p:stop()
-        
-    p1 = love.graphics.newParticleSystem(round_particle, 1000)
-        p1:setEmissionRate(300)
-        p1:setSpeed(100, 150)
-        p1:setSize(0.8, 0.1)
-        p1:setColor(255, 255, 255, 200, 200, 0, 0, 100)
-        p1:setPosition(400, 300)
-        p1:setLifetime(0)
-        p1:setParticleLife(0.05)
-        p1:setDirection(7.853)
-        p1:setSpread(0)
-        p1:setTangentialAcceleration(0)
-        p1:setRadialAcceleration(1)
-        p1:setGravity(15)
-        p1:stop()
-        
 end
 function love.update(dt)
-    p:setPosition(zig.x, zig.y + 1)
-    p:start()
-        
-    p1:setPosition(zig.x, zig.y + 1)
-    p1:start()
-    
-    p:update(dt)
-    p1:update(dt)
+    zig.update(dt)
 end
 function love.draw()
     pewpew.debug( )
@@ -98,36 +63,83 @@ pewpew = {}
 pewpew.debug_queue = {}
 pewpew.timers = {}
 pewpew.timers.laser = {
-     delay = 500
+     delay = 200
     ,last_fired = nil
     ,ready = function()
-                if not pewpew.timers.laser.last_fired then
-                    pewpew.timers.laser.last_fired = socket.gettime()*1000
-                    return true
-                end
-                
-                local time = socket.gettime() * 1000
-                if time - pewpew.timers.laser.last_fired >= pewpew.timers.laser.delay then
-                    pewpew.timers.laser.last_fired = socket.gettime()*1000
-                    return true
-                end
-                return false
-             end
+        if not pewpew.timers.laser.last_fired then
+            pewpew.timers.laser.last_fired = socket.gettime()*1000
+            return true
+        end
+        
+        local time = socket.gettime() * 1000
+        if time - pewpew.timers.laser.last_fired >= pewpew.timers.laser.delay then
+            pewpew.timers.laser.last_fired = socket.gettime()*1000
+            return true
+        end
+        return false
+     end
 }
 
 function pewpew.spawnUnit(type, x, y)
     local unit = {}
     
     unit_types = {
-       zig = {
-           image = 'images/zig.gif'
-          ,role = 'player'
+        zig = {
+            image = 'images/zig.gif'
+            ,role = 'player'
+            ,render = function()
+                -- shouldn't be using globals in these functions
+                round_particle = love.graphics.newImage('images/part1.png');
+                zig.p = love.graphics.newParticleSystem(round_particle, 1000)
+                    p = zig.p
+                    p:setEmissionRate(300)
+                    p:setSpeed(50, 50)
+                    p:setSize(1.5, 0.1)
+                    p:setColor(0, 50, 255, 255, 0, 0, 150, 0)
+                    p:setPosition(400, 300)
+                    p:setLifetime(0)
+                    p:setParticleLife(0.05)
+                    p:setDirection(7.851)
+                    p:setSpread(0)
+                    p:setTangentialAcceleration(0)
+                    p:setRadialAcceleration(1)
+                    p:setGravity(15)
+                    p:stop()
+
+                zig.p1 = love.graphics.newParticleSystem(round_particle, 1000)
+                    p1 = zig.p1
+                    p1:setEmissionRate(300)
+                    p1:setSpeed(100, 150)
+                    p1:setSize(0.8, 0.1)
+                    p1:setColor(255, 255, 255, 200, 200, 0, 0, 100)
+                    p1:setPosition(400, 300)
+                    p1:setLifetime(0)
+                    p1:setParticleLife(0.05)
+                    p1:setDirection(7.853)
+                    p1:setSpread(0)
+                    p1:setTangentialAcceleration(0)
+                    p1:setRadialAcceleration(1)
+                    p1:setGravity(15)
+                    p1:stop()
+            end
+            ,update = function(dt)
+                zig.p:setPosition(zig.x, zig.y + 1)
+                zig.p:start()
+
+                zig.p1:setPosition(zig.x, zig.y + 1)
+                zig.p1:start()
+
+                zig.p:update(dt)
+                zig.p1:update(dt)
+            end
       }
       ,raven = {
            image = 'images/enemy_black.gif'
           ,role = 'enemy'
       }
     }
+    
+    unit = unit_types[type]
     
     unit.image = love.graphics.newImage(unit_types[type].image)
     
@@ -140,7 +152,7 @@ function pewpew.spawnUnit(type, x, y)
     unit.x = x or unit.ox
     unit.y = y or unit.oy
     
-    if unit_types[type].role == 'player' then
+    if type == 'zig' then
         zig = unit
     end
     
@@ -163,7 +175,7 @@ function pewpew.spawnProjectile(type, x, y, direction)
 end
 
 function pewpew.moveZig()
-    local speed = 3
+    local speed = 6
     if love.keyboard.isDown("right") then
         zig.x = zig.x + speed
     end
@@ -210,8 +222,8 @@ function pewpew.moveProjectiles()
         end
         
         if p.direction == 'up' then
-            p.line_y = p.line_y - 4
-            p.line_y1 = p.line_y1 - 4
+            p.line_y = p.line_y - 10
+            p.line_y1 = p.line_y1 - 10
             if p.line_y <= 0 then table.remove(projectiles, i) end
         end
     end
