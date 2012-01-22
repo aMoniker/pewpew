@@ -21,9 +21,11 @@ function love.load()
     pewpew.spawnUnit('zig', screen.width / 2, screen.height / 2)
     zig.render()
     
+    --[[
     for i=1,3 do
         pewpew.spawnUnit('raven', i * 20 + 30, i * 20 + 30)
     end
+    --]]
 end
 function love.update(dt)
     zig.update(dt)
@@ -77,6 +79,9 @@ function love.draw()
     end
     
     if love.keyboard.isDown(' ') and pewpew.timers.laser.ready( ) then
+        local laser_sound = love.audio.newSource('sound/laser.wav', 'static')
+        love.audio.play(laser_sound)
+        
         pewpew.spawnProjectile('laser', zig.x, zig.y, 'up')
     end
 end
@@ -215,7 +220,7 @@ function pewpew.spawnProjectile(type, x, y, direction)
             kk2:setColor(255, 100, 100, 200, 0, 0, 0, 0)
             kk2:setPosition(-900, -900)
             kk2:setLifetime(200)
-            kk2:setParticleLife(1)
+            kk2:setParticleLife(0.5)
             kk2:setDirection(7.851)
             kk2:setSpread(100)
             kk2:setTangentialAcceleration(0)
@@ -272,7 +277,7 @@ end
 function pewpew.moveProjectiles()
     for i, p in ipairs(projectiles) do
         if p.type == 'laser' then
-            p.y = p.y - 10
+            p.y = p.y - 12
             p.kk:setPosition(p.x, p.y)
             p.kk2:setPosition(p.x, p.y)
             if p.y <= -1000 then table.remove(projectiles, i) end
@@ -284,8 +289,9 @@ function pewpew.checkCollisions()
     for i, e in ipairs(enemies) do
         for n, p in ipairs(projectiles) do
             if pewpew.checkCollision(e.x - e.ox, e.y - e.oy, e.width, e.height * 0.6, p.x, p.y, 1, 1) then --hardcoded line values not good
-                --enemies.remove(e)
-                --projectiles.remove(e)
+                local explode_sound = love.audio.newSource('sound/explode.wav', 'static')
+                love.audio.play(explode_sound)
+                
                 table.remove(enemies, i)
                 --table.remove(projectiles, n)
             end
