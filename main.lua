@@ -28,7 +28,17 @@ end
 function love.update(dt)
     zig.update(dt)
     if #enemies < 3 then
-        pewpew.spawnUnit('raven', math.random(10, screen.width - 10), math.random(20, 60))
+        pewpew.spawnUnit('raven', math.random(10, screen.width - 10), math.random(30, 250))
+    end
+    
+    for i, p in ipairs(projectiles) do
+        if p.type == 'laser' then
+            p.kk:start()
+            p.kk:update(dt)
+            
+            p.kk2:start()
+            p.kk2:update(dt)
+        end
     end
 end
 function love.draw()
@@ -55,6 +65,15 @@ function love.draw()
         --love.graphics.setColorMode('replace')
         --love.graphics.setColor(255, 0, 0, 255)
         --love.graphics.rectangle('line', enemy.x - enemy.ox, enemy.y - enemy.oy, enemy.width, enemy.height)
+    end
+    
+    for i, p in ipairs(projectiles) do
+        love.graphics.setColorMode('modulate')
+        if p.type == 'laser' then
+            love.graphics.draw(p.kk, 0, 0)
+            love.graphics.draw(p.kk2, 0, 0)
+        end
+        love.graphics.setColorMode('replace')
     end
     
     if love.keyboard.isDown(' ') and pewpew.timers.laser.ready( ) then
@@ -106,7 +125,7 @@ function pewpew.spawnUnit(type, x, y)
                     p:setSpread(0)
                     p:setTangentialAcceleration(0)
                     p:setRadialAcceleration(1)
-                    p:setGravity(15)
+                    p:setGravity(1500)
                     p:stop()
 
                 zig.p1 = love.graphics.newParticleSystem(round_particle, 1000)
@@ -166,13 +185,47 @@ function pewpew.spawnUnit(type, x, y)
 end
 function pewpew.spawnProjectile(type, x, y, direction)
     local projectile = {
-         type = type
-        ,direction = direction
-        ,line_x = x
-        ,line_y = y
-        ,line_x1 = x
-        ,line_y1 = y - 10
+          type = type
+         ,x = x
+         ,y = y
     }
+    
+    if type == 'laser' then
+        local round_particle = love.graphics.newImage('images/part1.png');
+        kk = love.graphics.newParticleSystem(round_particle, 100)
+            kk:setEmissionRate(100)
+            kk:setSpeed(50, 50)
+            kk:setSize(0.2, 0.2)
+            kk:setColor(255, 0, 0, 255, 255, 255, 255, 200)
+            kk:setPosition(-900, -900)
+            kk:setLifetime(200)
+            kk:setParticleLife(0.1)
+            kk:setDirection(7.851)
+            kk:setSpread(1000)
+            kk:setTangentialAcceleration(0)
+            kk:setRadialAcceleration(1)
+            kk:setGravity(150)
+            kk:stop()
+            
+
+        kk2 = love.graphics.newParticleSystem(round_particle, 100)
+            kk2:setEmissionRate(100)
+            kk2:setSpeed(50, 0)
+            kk2:setSize(0.3, 0.3)
+            kk2:setColor(255, 100, 100, 200, 0, 0, 0, 0)
+            kk2:setPosition(-900, -900)
+            kk2:setLifetime(200)
+            kk2:setParticleLife(1)
+            kk2:setDirection(7.851)
+            kk2:setSpread(100)
+            kk2:setTangentialAcceleration(0)
+            kk2:setRadialAcceleration(-100)
+            kk2:setGravity(100)
+            kk2:stop()
+            
+        projectile.kk = kk
+        projectile.kk2 = kk2
+    end
     
     projectiles[#projectiles + 1] = projectile
 end
@@ -219,15 +272,10 @@ end
 function pewpew.moveProjectiles()
     for i, p in ipairs(projectiles) do
         if p.type == 'laser' then
-            love.graphics.setLine( 3, 'rough' )
-            love.graphics.setColor( 255, 0, 0, 255 )
-            love.graphics.line( p.line_x, p.line_y, p.line_x1, p.line_y1 )
-        end
-        
-        if p.direction == 'up' then
-            p.line_y = p.line_y - 10
-            p.line_y1 = p.line_y1 - 10
-            if p.line_y <= 0 then table.remove(projectiles, i) end
+            p.y = p.y - 10
+            p.kk:setPosition(p.x, p.y)
+            p.kk2:setPosition(p.x, p.y)
+            if p.y <= -1000 then table.remove(projectiles, i) end
         end
     end
 end
@@ -235,11 +283,11 @@ end
 function pewpew.checkCollisions()
     for i, e in ipairs(enemies) do
         for n, p in ipairs(projectiles) do
-            if pewpew.checkCollision(e.x - e.ox, e.y - e.oy, e.width, e.height * 0.6, p.line_x-1,p.line_y1,3,10) then --hardcoded line values not good
+            if pewpew.checkCollision(e.x - e.ox, e.y - e.oy, e.width, e.height * 0.6, p.x, p.y, 1, 1) then --hardcoded line values not good
                 --enemies.remove(e)
                 --projectiles.remove(e)
                 table.remove(enemies, i)
-                table.remove(projectiles, n)
+                --table.remove(projectiles, n)
             end
         end
     end
