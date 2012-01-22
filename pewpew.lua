@@ -34,7 +34,7 @@ function pewpew.spawnUnit(type, x, y)
             ,render = function()
                 -- shouldn't be using globals in these functions
                 round_particle = love.graphics.newImage('images/part1.png');
-                zig.p = love.graphics.newParticleSystem(round_particle, 1000)
+                zig.p = love.graphics.newParticleSystem(round_particle, 100)
                     p = zig.p
                     p:setEmissionRate(300)
                     p:setSpeed(50, 50)
@@ -50,7 +50,7 @@ function pewpew.spawnUnit(type, x, y)
                     p:setGravity(1500)
                     p:stop()
 
-                zig.p1 = love.graphics.newParticleSystem(round_particle, 1000)
+                zig.p1 = love.graphics.newParticleSystem(round_particle, 100)
                     p1 = zig.p1
                     p1:setEmissionRate(300)
                     p1:setSpeed(100, 150)
@@ -80,6 +80,8 @@ function pewpew.spawnUnit(type, x, y)
       ,raven = {
            image = 'images/enemy_black.gif'
           ,role = 'enemy'
+          ,total_hp = 100
+          ,current_hp = 100
       }
     }
     
@@ -205,12 +207,20 @@ end
 function pewpew.checkCollisions()
     for i, e in ipairs(pewpew.enemies) do
         for n, p in ipairs(pewpew.projectiles) do
-            if pewpew.checkCollision(e.x - e.ox, e.y - e.oy, e.width, e.height * 0.6, p.x, p.y, 1, 1) then --hardcoded line values not good
-                local explode_sound = love.audio.newSource('sound/explode.wav', 'static')
-                love.audio.play(explode_sound)
+            if pewpew.checkCollision(e.x - e.ox, e.y - e.oy, e.width, e.height * 0.6, p.x, p.y, 1, 1) then
+                e.current_hp = e.current_hp - 10
                 
-                table.remove(pewpew.enemies, i)
-                --table.remove(pewpew.projectiles, n)
+                local hit_sound
+                if(e.current_hp <= 0) then
+                    hit_sound = love.audio.newSource('sound/explode.wav', 'static')
+
+                    table.remove(pewpew.enemies, i)
+                    --table.remove(pewpew.projectiles, n)
+                else
+                    hit_sound = love.audio.newSource('sound/hit.wav', 'static')
+                end
+                
+                love.audio.play(hit_sound)
             end
         end
     end

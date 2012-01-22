@@ -23,8 +23,8 @@ function love.load()
 end
 function love.update(dt)
     zig.update(dt)
-    if #pewpew.enemies < 3 then
-        pewpew.spawnUnit('raven', math.random(10, pewpew.screen.width - 10), math.random(30, 250))
+    if #pewpew.enemies < 12 then
+        pewpew.spawnUnit('raven', math.random(10, pewpew.screen.width - 10), math.random(50, 500))
     end
     
     for i, p in ipairs(pewpew.projectiles) do
@@ -56,11 +56,17 @@ function love.draw()
     for i, enemy in ipairs(pewpew.enemies) do
         love.graphics.draw(enemy.image, enemy.x, enemy.y, 0, 1, 1, enemy.ox, enemy.oy)
         
-        
         --love.graphics.setLine( 1, 'rough' )
         --love.graphics.setColorMode('replace')
         --love.graphics.setColor(255, 0, 0, 255)
         --love.graphics.rectangle('line', enemy.x - enemy.ox, enemy.y - enemy.oy, enemy.width, enemy.height)
+        
+        love.graphics.setLine(1, 'rough')
+        love.graphics.setColorMode('replace')
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.rectangle('line', enemy.x - enemy.ox, enemy.y - enemy.oy - 20, enemy.width, 10)
+        love.graphics.setColor(255, 0, 0, 255)
+        love.graphics.rectangle('fill', enemy.x - enemy.ox + 1, enemy.y - enemy.oy - 19, (enemy.width - 3) * (enemy.current_hp / enemy.total_hp), 8)
     end
     
     for i, p in ipairs(pewpew.projectiles) do
@@ -79,4 +85,3 @@ function love.draw()
         pewpew.spawnProjectile('laser', zig.x, zig.y, 'up')
     end
 end
-
