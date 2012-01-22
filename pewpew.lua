@@ -95,6 +95,7 @@ function pewpew.spawnUnit(type, x, y)
           ,role = 'enemy'
           ,total_hp = 100
           ,current_hp = 100
+          ,value = 50
       }
     }
     
@@ -239,6 +240,7 @@ function pewpew.checkCollisions()
                     pewpew.playSound('explode')
                     table.remove(pewpew.enemies, i)
                     --table.remove(pewpew.projectiles, n)
+                    pewpew.score = pewpew.score + e.value
                 else
                     pewpew.playSound('hit')
                 end

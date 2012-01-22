@@ -63,6 +63,8 @@ function love.draw()
     
     pewpew.checkCollisions( )
     
+    love.graphics.printf(pewpew.score, 0, 20, pewpew.screen.width - 20, 'right')
+    
     zig.draw()
     
     for i, p in ipairs(pewpew.projectiles) do
