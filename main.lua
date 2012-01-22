@@ -53,22 +53,6 @@ function love.draw()
     
     love.graphics.draw(zig.image, zig.x, zig.y, 0, 1, 1, zig.ox, zig.oy)
     
-    for i, enemy in ipairs(pewpew.enemies) do
-        love.graphics.draw(enemy.image, enemy.x, enemy.y, 0, 1, 1, enemy.ox, enemy.oy)
-        
-        --love.graphics.setLine( 1, 'rough' )
-        --love.graphics.setColorMode('replace')
-        --love.graphics.setColor(255, 0, 0, 255)
-        --love.graphics.rectangle('line', enemy.x - enemy.ox, enemy.y - enemy.oy, enemy.width, enemy.height)
-        
-        love.graphics.setLine(1, 'rough')
-        love.graphics.setColorMode('replace')
-        love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.rectangle('line', enemy.x - enemy.ox, enemy.y - enemy.oy - 20, enemy.width, 10)
-        love.graphics.setColor(255, 0, 0, 255)
-        love.graphics.rectangle('fill', enemy.x - enemy.ox + 1, enemy.y - enemy.oy - 19, (enemy.width - 3) * (enemy.current_hp / enemy.total_hp), 8)
-    end
-    
     for i, p in ipairs(pewpew.projectiles) do
         love.graphics.setColorMode('modulate')
         if p.type == 'laser' then
@@ -76,6 +60,17 @@ function love.draw()
             love.graphics.draw(p.kk2, 0, 0)
         end
         love.graphics.setColorMode('replace')
+    end
+    
+    for i, enemy in ipairs(pewpew.enemies) do
+        love.graphics.draw(enemy.image, enemy.x, enemy.y, 0, 1, 1, enemy.ox, enemy.oy)
+        
+        love.graphics.setLine(1, 'rough')
+        love.graphics.setColorMode('replace')
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.rectangle('line', enemy.x - enemy.ox, enemy.y - enemy.oy - 20, enemy.width, 10)
+        love.graphics.setColor(255, 0, 0, 255)
+        love.graphics.rectangle('fill', enemy.x - enemy.ox + 1, enemy.y - enemy.oy - 19, (enemy.width - 3) * (enemy.current_hp / enemy.total_hp), 8)
     end
     
     if love.keyboard.isDown(' ') and pewpew.timers.laser.ready( ) then
