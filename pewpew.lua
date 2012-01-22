@@ -1,14 +1,16 @@
 pewpew = {
      start = false
     ,playing = false
+    ,score = 0
+    
+    ,screen = {}
+    ,enemies = {}
+    ,projectiles = {}
+    ,timers = {}
+    
+    ,debug_queue = {}
 }
-pewpew.screen = {}
 
-pewpew.enemies = {}
-pewpew.projectiles = {}
-
-pewpew.debug_queue = {}
-pewpew.timers = {}
 pewpew.timers.laser = {
      delay = 200
     ,last_fired = nil
@@ -165,6 +167,17 @@ function pewpew.spawnProjectile(type, x, y, direction)
     pewpew.projectiles[#pewpew.projectiles + 1] = projectile
 end
 
+function pewpew.playSound(sound)
+    local files = {
+         laser    = 'sound/laser.wav'
+        ,hit      = 'sound/hit.wav'
+        ,explode  = 'sound/explode.wav'
+    }
+    
+    local sound = love.audio.newSource(files[sound], 'static')
+    love.audio.play(sound)
+end
+
 function pewpew.moveZig()
     local speed = 6
     if love.keyboard.isDown("right") then
@@ -223,15 +236,12 @@ function pewpew.checkCollisions()
                 
                 local hit_sound
                 if(e.current_hp <= 0) then
-                    hit_sound = love.audio.newSource('sound/explode.wav', 'static')
-
+                    pewpew.playSound('explode')
                     table.remove(pewpew.enemies, i)
                     --table.remove(pewpew.projectiles, n)
                 else
-                    hit_sound = love.audio.newSource('sound/hit.wav', 'static')
+                    pewpew.playSound('hit')
                 end
-                
-                love.audio.play(hit_sound)
             end
         end
     end

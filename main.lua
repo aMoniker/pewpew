@@ -86,9 +86,7 @@ function love.draw()
     end
     
     if love.keyboard.isDown(' ') and pewpew.timers.laser.ready( ) then
-        local laser_sound = love.audio.newSource('sound/laser.wav', 'static')
-        love.audio.play(laser_sound)
-        
+        pewpew.playSound('laser')
         pewpew.spawnProjectile('laser', zig.x, zig.y, 'up')
     end
 end
