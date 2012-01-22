@@ -1,4 +1,7 @@
-pewpew = {}
+pewpew = {
+     start = false
+    ,playing = false
+}
 pewpew.screen = {}
 
 pewpew.enemies = {}
@@ -35,7 +38,7 @@ function pewpew.spawnUnit(type, x, y)
                 -- shouldn't be using globals in these functions
                 round_particle = love.graphics.newImage('images/part1.png');
                 zig.p = love.graphics.newParticleSystem(round_particle, 100)
-                    p = zig.p
+                    local p = zig.p
                     p:setEmissionRate(300)
                     p:setSpeed(50, 50)
                     p:setSize(1.5, 0.1)
@@ -51,7 +54,7 @@ function pewpew.spawnUnit(type, x, y)
                     p:stop()
 
                 zig.p1 = love.graphics.newParticleSystem(round_particle, 100)
-                    p1 = zig.p1
+                    local p1 = zig.p1
                     p1:setEmissionRate(300)
                     p1:setSpeed(100, 150)
                     p1:setSize(0.8, 0.1)
@@ -75,6 +78,14 @@ function pewpew.spawnUnit(type, x, y)
 
                 zig.p:update(dt)
                 zig.p1:update(dt)
+            end
+            ,draw = function()
+                love.graphics.setColorMode('modulate')
+                love.graphics.draw(zig.p, 0, 0)
+                love.graphics.draw(zig.p1, 0, 0)
+                love.graphics.setColorMode('replace')
+                
+                love.graphics.draw(zig.image, zig.x, zig.y, 0, 1, 1, zig.ox, zig.oy)
             end
       }
       ,raven = {

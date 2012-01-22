@@ -12,8 +12,7 @@ function love.load()
     
     love.graphics.setColorMode('replace')
     
-    pewpew.spawnUnit('zig', pewpew.screen.width / 2, pewpew.screen.height / 2)
-    zig.render()
+    love.graphics.newFont(32) --not working? probably need custom font
     
     --[[
     for i=1,3 do
@@ -22,6 +21,16 @@ function love.load()
     --]]
 end
 function love.update(dt)
+    if love.keyboard.isDown('return') and pewpew.playing == false then pewpew.start = true end
+    if pewpew.start == true then
+        pewpew.spawnUnit('zig', pewpew.screen.width / 2, pewpew.screen.height / 2)
+        zig.render()
+        
+        pewpew.start = false
+        pewpew.playing = true
+    end
+    if pewpew.playing == false then return end
+    
     zig.update(dt)
     if #pewpew.enemies < 12 then
         pewpew.spawnUnit('raven', math.random(10, pewpew.screen.width - 10), math.random(50, 500))
@@ -38,12 +47,15 @@ function love.update(dt)
     end
 end
 function love.draw()
-    pewpew.debug( )
     
-    love.graphics.setColorMode('modulate')
-    love.graphics.draw(p, 0, 0)
-    love.graphics.draw(p1, 0, 0)
-    love.graphics.setColorMode('replace')
+    if pewpew.playing == false then
+        --title screen
+        love.graphics.printf("pewpew, bitches\n(press enter)", 0, pewpew.screen.height / 2, pewpew.screen.width, 'center')
+        return
+    end
+    
+    
+    pewpew.debug( )
     
     pewpew.moveZig( )
     pewpew.moveEnemies( )
@@ -51,7 +63,7 @@ function love.draw()
     
     pewpew.checkCollisions( )
     
-    love.graphics.draw(zig.image, zig.x, zig.y, 0, 1, 1, zig.ox, zig.oy)
+    zig.draw()
     
     for i, p in ipairs(pewpew.projectiles) do
         love.graphics.setColorMode('modulate')
