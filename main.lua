@@ -26,6 +26,8 @@ function love.update(dt)
         pewpew.spawnUnit('zig', pewpew.screen.width / 2, pewpew.screen.height / 2)
         zig.render()
         
+        --pewpew.playMusic( )
+        
         pewpew.start = false
         pewpew.playing = true
     end

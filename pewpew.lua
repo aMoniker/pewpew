@@ -3,6 +3,8 @@ pewpew = {
     ,playing = false
     ,score = 0
     
+    ,music_playing = false
+    
     ,screen = {}
     ,enemies = {}
     ,projectiles = {}
@@ -178,6 +180,18 @@ function pewpew.playSound(sound)
     local sound = love.audio.newSource(files[sound], 'static')
     love.audio.play(sound)
 end
+--[[
+function pewpew.playMusic()
+    if pewpew.music_playing == false then
+        bgm = love.audio.newSource('sound/bg_music_2.wav', 'stream')
+        bgm:setLooping(true)
+        love.audio.play(bgm)
+        pewpew.music_playing = true
+    elseif bgm:isStopped( ) then
+        love.audio.play(bgm)
+    end
+end
+--]]
 
 function pewpew.moveZig()
     local speed = 6
@@ -226,13 +240,19 @@ function pewpew.moveProjectiles()
             p.kk2:setPosition(p.x, p.y)
             if p.y <= -1000 then table.remove(pewpew.projectiles, i) end
         end
+        
+        --[[
+        if p.type == 'bullet' then
+            p.y
+        end
+        ]]--
     end
 end
 
 function pewpew.checkCollisions()
     for i, e in ipairs(pewpew.enemies) do
         for n, p in ipairs(pewpew.projectiles) do
-            if pewpew.checkCollision(e.x - e.ox, e.y - e.oy, e.width, e.height * 0.6, p.x, p.y, 1, 1) then
+            if pewpew.checkCollision(e.x - e.ox + 5, e.y - e.oy, e.width + 5, e.height * 0.6, p.x, p.y, 1, 1) then
                 e.current_hp = e.current_hp - 10
                 
                 local hit_sound
@@ -245,6 +265,15 @@ function pewpew.checkCollisions()
                     pewpew.playSound('hit')
                 end
             end
+        end
+        
+        if pewpew.checkCollision(e.x - e.ox, e.y - e.oy * 0.3, e.width * 0.8, e.height * 0.2,
+                                 zig.x - zig.ox, zig.y - zig.oy, zig.width, zig.height) then
+            pewpew.playSound('explode')
+            pewpew.score = pewpew.score - 100
+            zig = nil
+            pewpew.spawnUnit('zig', pewpew.screen.width / 2, pewpew.screen.height / 2)
+            zig.render()
         end
     end
 end
