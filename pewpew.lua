@@ -30,6 +30,13 @@ pewpew.timers.laser = {
         return false
      end
 }
+pewpew.timers.bullet = {
+     delay = 1000
+    ,last_fired = nil
+    ,ready = function()
+        --if not 
+    end
+}
 
 function pewpew.spawnUnit(type, x, y)
     local unit = {}
@@ -180,10 +187,11 @@ function pewpew.playSound(sound)
     local sound = love.audio.newSource(files[sound], 'static')
     love.audio.play(sound)
 end
---[[
 function pewpew.playMusic()
     if pewpew.music_playing == false then
         bgm = love.audio.newSource('sound/bg_music_2.wav', 'stream')
+        
+        --this doesn't loop properly, there's a gap
         bgm:setLooping(true)
         love.audio.play(bgm)
         pewpew.music_playing = true
@@ -191,24 +199,55 @@ function pewpew.playMusic()
         love.audio.play(bgm)
     end
 end
---]]
 
 function pewpew.moveZig()
     local speed = 6
     if love.keyboard.isDown("right") then
-        zig.x = zig.x + speed
+        local right_edge = zig.x + zig.ox
+        
+        if right_edge ~= pewpew.screen.width then
+            if right_edge >= pewpew.screen.width - speed then
+                zig.x = zig.x + (pewpew.screen.width - right_edge)
+            else
+                zig.x = zig.x + speed
+            end
+        end
     end
     
     if love.keyboard.isDown('left') then
-        zig.x = zig.x - speed
+        local left_edge = zig.x - zig.ox
+        
+        if left_edge ~= 0 then
+            if left_edge <= speed then
+                zig.x = zig.ox
+            else
+                zig.x = zig.x - speed
+            end
+        end
     end
     
     if love.keyboard.isDown('up') then
-        zig.y = zig.y - speed
+        local top_edge = zig.y - zig.oy
+        
+        if top_edge ~= 0 then
+            if top_edge <= speed then
+                zig.y = zig.oy
+            else
+                zig.y = zig.y - speed
+            end
+        end
     end
     
     if love.keyboard.isDown('down') then
-        zig.y = zig.y + speed
+        local bottom_edge = zig.y + zig.oy
+        
+        if bottom_edge ~= pewpew.screen.height then
+            if bottom_edge >= pewpew.screen.height - speed then
+                zig.y = zig.y + (pewpew.screen.height - bottom_edge)
+            else
+                zig.y = zig.y + speed
+            end
+        end
     end
 end
 function pewpew.moveEnemies()

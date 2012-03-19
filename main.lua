@@ -14,19 +14,13 @@ function love.load()
     
     love.graphics.newFont(32) --not working? probably need custom font
     
-    --[[
-    for i=1,3 do
-        pewpew.spawnUnit('raven', i * 20 + 30, i * 20 + 30)
-    end
-    --]]
+    --pewpew.playMusic( )
 end
 function love.update(dt)
     if love.keyboard.isDown('return') and pewpew.playing == false then pewpew.start = true end
     if pewpew.start == true then
         pewpew.spawnUnit('zig', pewpew.screen.width / 2, pewpew.screen.height / 2)
         zig.render()
-        
-        --pewpew.playMusic( )
         
         pewpew.start = false
         pewpew.playing = true
@@ -46,6 +40,11 @@ function love.update(dt)
             p.kk2:start()
             p.kk2:update(dt)
         end
+    end
+    
+    if love.keyboard.isDown(' ') and pewpew.timers.laser.ready( ) then
+        pewpew.playSound('laser')
+        pewpew.spawnProjectile('laser', zig.x, zig.y, 'up')
     end
 end
 function love.draw()
@@ -81,6 +80,7 @@ function love.draw()
     for i, enemy in ipairs(pewpew.enemies) do
         love.graphics.draw(enemy.image, enemy.x, enemy.y, 0, 1, 1, enemy.ox, enemy.oy)
         
+        -- health bar
         love.graphics.setLine(1, 'rough')
         love.graphics.setColorMode('replace')
         love.graphics.setColor(255, 255, 255, 255)
@@ -88,9 +88,11 @@ function love.draw()
         love.graphics.setColor(255, 0, 0, 255)
         love.graphics.rectangle('fill', enemy.x - enemy.ox + 1, enemy.y - enemy.oy - 19, (enemy.width - 3) * (enemy.current_hp / enemy.total_hp), 8)
     end
-    
-    if love.keyboard.isDown(' ') and pewpew.timers.laser.ready( ) then
-        pewpew.playSound('laser')
-        pewpew.spawnProjectile('laser', zig.x, zig.y, 'up')
-    end
+end
+
+function love.keypressed(key, u)
+   --Debug mode go
+   if key == "lctrl" then
+      debug.debug()
+   end
 end
