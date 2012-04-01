@@ -292,17 +292,17 @@ function pewpew.checkCollisions()
     for i, e in ipairs(pewpew.enemies) do
         for n, p in ipairs(pewpew.projectiles) do
             if pewpew.checkCollision(e.x - e.ox + 5, e.y - e.oy, e.width + 5, e.height * 0.6, p.x, p.y, 1, 1) then
-                e.current_hp = e.current_hp - 10
+                e.current_hp = e.current_hp - 50
                 
                 local hit_sound
                 if(e.current_hp <= 0) then
                     pewpew.playSound('explode')
                     table.remove(pewpew.enemies, i)
-                    --table.remove(pewpew.projectiles, n)
                     pewpew.score = pewpew.score + e.value
                 else
                     pewpew.playSound('hit')
                 end
+                table.remove(pewpew.projectiles, n)
             end
         end
         

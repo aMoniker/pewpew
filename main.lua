@@ -5,7 +5,7 @@ require 'pewpew'
 function love.load()
     local screen_modes = love.graphics.getModes()
     table.sort(screen_modes, function(a, b) return a.width * a.height < b.width * b.height end)
-    love.graphics.setMode( screen_modes[#screen_modes].width, screen_modes[#screen_modes].height, false, true, 0 )
+    love.graphics.setMode( screen_modes[#screen_modes].width, screen_modes[#screen_modes].height, true, true, 0 )
     
     pewpew.screen.width = love.graphics.getWidth( )
     pewpew.screen.height = love.graphics.getHeight( )
